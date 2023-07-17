@@ -14,6 +14,7 @@ public class DataBaseController {
     
     private static final String ROOT_NAME = "root";       
     private static final String DB_PASSWORD = "root";
+    private static final String DB_NAME = "mydb";
 
     public DataBaseController() throws SQLException {
 
@@ -22,7 +23,7 @@ public class DataBaseController {
     public static boolean authorizeUser(String username, String password) throws Exception {
         
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb",ROOT_NAME,DB_PASSWORD);
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME, ROOT_NAME,DB_PASSWORD);
             Statement stmt = con.createStatement();  
             String query = "SELECT * FROM users WHERE username = " + "'" + username + "'" + " AND password =  " + "'" + password + "'";
             ResultSet rs = stmt.executeQuery(query);
