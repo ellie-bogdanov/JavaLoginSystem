@@ -43,7 +43,7 @@ public class DataBaseController {
 
     public static boolean checkForExistingUser(String username, String password) throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb?verifyServerCertificate=false&useSSL=true", ROOT_NAME, DB_PASSWORD);
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME + "?verifyServerCertificate=false&useSSL=true", ROOT_NAME, DB_PASSWORD);
         Statement stmt = con.createStatement();
         String query = "SELECT * FROM users WHERE username = " + "'" + username + "'";
         ResultSet rs = stmt.executeQuery(query);
