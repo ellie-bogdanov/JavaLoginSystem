@@ -1,9 +1,12 @@
 package LoginSystem;
 
+ import TextEditor.TextEditor;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.Socket;
 import java.sql.SQLException;
 
 
@@ -12,6 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import Server.Client;
 
 public class LoginPage implements ActionListener{
 
@@ -162,10 +167,8 @@ public class LoginPage implements ActionListener{
 
 
                 } catch (ClassNotFoundException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }
@@ -182,7 +185,9 @@ public class LoginPage implements ActionListener{
                     this.messagLabel.setForeground(Color.GREEN);
                     this.messagLabel.setText("Login Successful");
                     this.frame.dispose();
-                    new WelcomePage(userID);
+                    new TextEditor(userID);
+
+            
                 }
                 else {
                     this.messagLabel.setForeground(Color.RED);
@@ -193,7 +198,6 @@ public class LoginPage implements ActionListener{
             } catch (SQLException e1) {
                 e1.printStackTrace();
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         }

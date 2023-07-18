@@ -13,7 +13,7 @@ public class DataBaseController {
 
     
     private static final String ROOT_NAME = "root";       
-    private static final String DB_PASSWORD = "root";
+    private static final String DB_PASSWORD = "samgy2010";
     private static final String DB_NAME = "mydb";
 
     public DataBaseController() throws SQLException {
@@ -65,7 +65,29 @@ public class DataBaseController {
 
         }
         return doesUserNotExist;
-}
+    }
+
+    public static boolean resetPassword(String username, String oldPassword, String newPassword) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME + "?verifyServerCertificate=false&useSSL=true", ROOT_NAME, DB_PASSWORD);
+        Statement stmt = con.createStatement();
+        String checkUserQuery = "SELECT * FROM users WHERE username = " + "'" + username + "'";
+        ResultSet rs = stmt.executeQuery(checkUserQuery);
+        if(!rs.next()) {
+            return false;
+        }
+
+        String query = "UPDATE users SET password = " + "'" + newPassword + "'" + "WHERE password = " + "'" + oldPassword + "'"; 
+        try {
+            stmt.executeUpdate(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+
+    }
+
 
     
 }
