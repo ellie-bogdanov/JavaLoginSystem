@@ -37,18 +37,7 @@ import LoginSystem.LoginPage;
 import Constants.ConstantsGUI;
 
 public class TextEditor extends JFrame implements ActionListener{
-    /*static public final int WINDOW_WIDTH = 500;
-    static public final int WINDOW_HEIGHT = 500;
 
-    static private final int SCROLL_PANE_WIDTH = 450;
-    static private final int SCROLL_PANE_HEIGHT = 450;
- 
-    static private final String FONT = "Arial";
-    static private final int FONT_SIZE = 20;
- 
-    static private final int FONT_SIZE_SPINNER_WIDTH = 50;
-    static private final int FONT_SIZE_SPINNER_HEIGHT = 25;
-    static private final int FONT_SIZE_SPINNER_VALUE = 20;*/
 
     private String username;
 
