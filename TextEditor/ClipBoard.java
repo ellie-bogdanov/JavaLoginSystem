@@ -13,16 +13,7 @@ import Constants.ConstantsGUI;
 
 public class ClipBoard extends JFrame{
 
-    /*private static final int FRAME_WIDTH = 1000;
-    private static final int FRAME_HEIGHT = 1000;
 
-    private static final int MESSAGE_X = 500;
-    private static final int MESSAGE_Y = 0;
-    private static final int MESSAGE_WIDTH = 300;
-    private static final int MESSAGE_HEIGHT = 100;
-    private static final int MESSAGE_DISPLASE_VALUE = 30;
-
-    private static final int FONT_SIZE = 20;*/
 
 
 
