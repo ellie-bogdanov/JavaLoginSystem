@@ -6,7 +6,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.Socket;
+import java.io.UnsupportedEncodingException;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 
 
@@ -16,11 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import Server.Client;
+import Constants.ConstantsDB;
+import Constants.ConstantsGUI;
+
 
 public class LoginPage implements ActionListener{
 
-    static final int MAX_USERNAME_LENGTH = 20;
+    /*static final int MAX_USERNAME_LENGTH = 20;
     static final int MIN_USERNAME_LENGTH = 5;
 
     static final int MAX_PASSWORD_LENGTH = 30;
@@ -49,7 +54,7 @@ public class LoginPage implements ActionListener{
     static final int BUTTON_WIDTH = 100;
     static final int BUTTON_HEIGHT = 25;
  
-    static final int FONT_SIZE = 25;
+    static final int FONT_SIZE = 25;*/
 
 
     
@@ -64,25 +69,26 @@ public class LoginPage implements ActionListener{
     JLabel messagLabel = new JLabel();
 
 
+    DataBaseController dataBaseController;
 
-    public LoginPage() {
+    public LoginPage() throws ClassNotFoundException, SQLException {
+        this.dataBaseController = new DataBaseController();
 
+        this.userIDLabel.setBounds(ConstantsGUI.USER_LABEL_X, ConstantsGUI.USER_LABEL_Y, ConstantsGUI.USER_LABEL_WIDTH, ConstantsGUI.USER_LABEL_HEIGHT);
+        this.userPasswordLabel.setBounds(ConstantsGUI.USER_LABEL_X, ConstantsGUI.USER_LABEL_Y + 50, ConstantsGUI.USER_LABEL_WIDTH, ConstantsGUI.USER_LABEL_HEIGHT);
 
-        this.userIDLabel.setBounds(USER_LABEL_X, USER_LABEL_Y, USER_LABEL_WIDTH, USER_LABEL_HEIGHT);
-        this.userPasswordLabel.setBounds(USER_LABEL_X, USER_LABEL_Y + 50, USER_LABEL_WIDTH, USER_LABEL_HEIGHT);
+        this.messagLabel.setBounds(ConstantsGUI.MESSAGE_LABEL_X, ConstantsGUI.MESSAGE_LABEL_Y, ConstantsGUI.MESSAGE_LABEL_WIDTH, ConstantsGUI.MESSAGE_LABEL_HEIGHT);
+        this.messagLabel.setFont(new Font(null, Font.ITALIC, ConstantsGUI.FONT_SIZE));
 
-        this.messagLabel.setBounds(MESSAGE_LABEL_X, MESSAGE_LABEL_Y, MESSAGE_LABEL_WIDTH, MESSAGE_LABEL_HEIGHT);
-        this.messagLabel.setFont(new Font(null, Font.ITALIC, FONT_SIZE));
+        this.userIDField.setBounds(ConstantsGUI.USER_FIELD_X, ConstantsGUI.USER_FIELD_Y, ConstantsGUI.USER_FIELD_WIDTH, ConstantsGUI.USER_FIELD_HEIGHT);
 
-        this.userIDField.setBounds(USER_FIELD_X, USER_FIELD_Y, USER_FIELD_WIDTH, USER_FIELD_HEIGHT);
+        this.userPasswordField.setBounds(ConstantsGUI.USER_FIELD_X, ConstantsGUI.USER_FIELD_Y + 50, ConstantsGUI.USER_FIELD_WIDTH, ConstantsGUI.USER_FIELD_HEIGHT);
 
-        this.userPasswordField.setBounds(USER_FIELD_X, USER_FIELD_Y + 50, USER_FIELD_WIDTH, USER_FIELD_HEIGHT);
-
-        this.loginButton.setBounds(BUTTON_X, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        this.loginButton.setBounds(ConstantsGUI.BUTTON_X, ConstantsGUI.BUTTON_Y, ConstantsGUI.BUTTON_WIDTH, ConstantsGUI.BUTTON_HEIGHT);
         this.loginButton.setFocusable(false);
         this.loginButton.addActionListener(this);
 
-        this.registerButton.setBounds(BUTTON_X + 100, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        this.registerButton.setBounds(ConstantsGUI.BUTTON_X + 100, ConstantsGUI.BUTTON_Y, ConstantsGUI.BUTTON_WIDTH, ConstantsGUI.BUTTON_HEIGHT);
         this.registerButton.setFocusable(false);
         this.registerButton.addActionListener(this);
 
@@ -97,52 +103,11 @@ public class LoginPage implements ActionListener{
 
         this.frame.setLocationRelativeTo(null);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        this.frame.setSize(ConstantsGUI.FRAME_WIDTH, ConstantsGUI.FRAME_HEIGHT);
         frame.setLayout(null);
         frame.setVisible(true);
     }
 
-    private static boolean checkIfValidPassAndID(String username, String password) {
-        if( username == null || username.length() > MAX_USERNAME_LENGTH || username.length() < MIN_USERNAME_LENGTH)
-        {
-            return false;
-        }
-
-        if(password == null || password.length() > MAX_PASSWORD_LENGTH || password.length() < MIN_PASSWORD_LENGTH) {
-            return false;
-        }
-
-        for(int i = 0; i < username.length(); i++) {
-            if(!Character.isLetter(username.charAt(i)) && !Character.isDigit(username.charAt(i))) {
-                return false;
-            }
-        }
-
-        boolean symbolFlag = false;
-        boolean digitFlag = false;
-        boolean letterFlag = false;
-
-        for(int i = 0; i < password.length(); i++) {
-            if(!Character.isLetter(password.charAt(i)) && !Character.isDigit(password.charAt(i))) {
-                symbolFlag = true;
-            }
-
-            if(Character.isLetter(password.charAt(i))) {
-                letterFlag = true;
-            }
-
-            if(Character.isDigit(password.charAt(i))) {
-                digitFlag = true;
-            }
-
-            if(symbolFlag && digitFlag && letterFlag) {
-                return true;
-            }
-        }
-
-
-        return false;
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -152,26 +117,59 @@ public class LoginPage implements ActionListener{
             //this.userPasswordField.setText("");
             String userID = this.userIDField.getText();
             String userPassword = String.valueOf(userPasswordField.getPassword());
-            if(checkIfValidPassAndID(userID, userPassword)) {
-                try {
-                    if(DataBaseController.checkForExistingUser(userID, userPassword)) {
+            int registerState;
+            try {
+                registerState = this.dataBaseController.register(userID, userPassword);
+
+                switch(registerState) {
+                    case ConstantsDB.WEAK_PASSWORD_RETURN_VAL:
+                        this.userIDField.setText("");
+                        this.userPasswordField.setText("");
+                        this.messagLabel.setForeground(Color.RED);
+                        this.messagLabel.setText("Weak Password");  
+                        break;
+                    
+                    case ConstantsDB.WEAK_USERNAME_RETURN_VAL:
+                        this.userIDField.setText("");
+                        this.userPasswordField.setText("");
+                        this.messagLabel.setForeground(Color.RED);
+                        this.messagLabel.setText("Weak Password");
+                        break;
+
+                    case ConstantsDB.USER_ALREADY_EXISTS_RETURN_VAL:
+                        this.userIDField.setText("");
+                        this.userPasswordField.setText("");
+                        this.messagLabel.setForeground(Color.RED);
+                        this.messagLabel.setText("User Exists");
+                        break;
+                    
+                    default:
                         this.userIDField.setText("");
                         this.userPasswordField.setText("");
                         this.messagLabel.setForeground(Color.GREEN);
                         this.messagLabel.setText("Registered Successfully");
-                    }
-                    else {
-                        this.messagLabel.setForeground(Color.RED);
-                        this.messagLabel.setText("User Exists");
-                    }
-
-
-                } catch (ClassNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
+                        break;
                 }
+            } catch (ClassNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (NoSuchAlgorithmException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (InvalidKeySpecException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (InvalidUsernameStringException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
+
         }
 
         if(e.getSource().equals(this.loginButton)) {
@@ -180,7 +178,7 @@ public class LoginPage implements ActionListener{
             String userPassword = String.valueOf(userPasswordField.getPassword());
 
             try {
-                boolean flag = DataBaseController.authorizeUser(userID, userPassword); 
+                boolean flag = this.dataBaseController.authorizeUser(userID, userPassword); 
                 if(flag) {
                     this.messagLabel.setForeground(Color.GREEN);
                     this.messagLabel.setText("Login Successful");
