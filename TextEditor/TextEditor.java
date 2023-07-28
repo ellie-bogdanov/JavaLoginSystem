@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.Socket;
+
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -31,12 +32,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-
+import LoginSystem.DataBaseController;
 import LoginSystem.LoginPage;
-
+import Constants.ConstantsGUI;
 
 public class TextEditor extends JFrame implements ActionListener{
-    static public final int WINDOW_WIDTH = 500;
+    /*static public final int WINDOW_WIDTH = 500;
     static public final int WINDOW_HEIGHT = 500;
 
     static private final int SCROLL_PANE_WIDTH = 450;
@@ -47,10 +48,11 @@ public class TextEditor extends JFrame implements ActionListener{
  
     static private final int FONT_SIZE_SPINNER_WIDTH = 50;
     static private final int FONT_SIZE_SPINNER_HEIGHT = 25;
-    static private final int FONT_SIZE_SPINNER_VALUE = 20;
+    static private final int FONT_SIZE_SPINNER_VALUE = 20;*/
 
     private String username;
 
+    private JButton uploadMessage;
     private JButton profile;
     private JTextArea textArea;
     private JScrollPane scrollPane;
@@ -64,17 +66,20 @@ public class TextEditor extends JFrame implements ActionListener{
     JMenuItem saveItem;
     JMenuItem exitItem;
     JMenuItem logoutItem;
+    JMenuItem openClipBoardItem;
 
     
+    DataBaseController dataBaseController;
 
 
 
-
-    public TextEditor(String username) {
+    public TextEditor(String username) throws ClassNotFoundException, SQLException {
         this.username = username;
 
+        this.dataBaseController = new DataBaseController();
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        this.setSize(ConstantsGUI.FRAME_WIDTH, ConstantsGUI.FRAME_HEIGHT);
         this.setLayout(new FlowLayout());
         this.setLocationRelativeTo(null);
 
@@ -82,10 +87,10 @@ public class TextEditor extends JFrame implements ActionListener{
 
         this.textArea.setLineWrap(true);
         this.textArea.setWrapStyleWord(true);
-        this.textArea.setFont(new Font(FONT, Font.PLAIN, FONT_SIZE));
+        this.textArea.setFont(new Font(null, Font.PLAIN, ConstantsGUI.FONT_SIZE));
 
         this.scrollPane = new JScrollPane(this.textArea);
-        this.scrollPane.setPreferredSize(new Dimension(SCROLL_PANE_WIDTH, SCROLL_PANE_HEIGHT));
+        this.scrollPane.setPreferredSize(new Dimension(ConstantsGUI.SCROLL_PANE_WIDTH, ConstantsGUI.SCROLL_PANE_HEIGHT));
         this.scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         this.profile = new JButton("Profile");
@@ -95,16 +100,20 @@ public class TextEditor extends JFrame implements ActionListener{
         this.fontLabel = new JLabel("Font: ");
 
         this.fontSizeSpinner = new JSpinner();
-        this.fontSizeSpinner.setPreferredSize(new Dimension(FONT_SIZE_SPINNER_WIDTH, FONT_SIZE_SPINNER_HEIGHT));
-        this.fontSizeSpinner.setValue(FONT_SIZE_SPINNER_VALUE);
+        this.fontSizeSpinner.setPreferredSize(new Dimension(ConstantsGUI.FONT_SIZE_SPINNER_WIDTH, ConstantsGUI.FONT_SIZE_SPINNER_HEIGHT));
+        this.fontSizeSpinner.setValue(ConstantsGUI.FONT_SIZE_SPINNER_VALUE);
         this.fontSizeSpinner.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                textArea.setFont(new Font(FONT, Font.PLAIN, (int) fontSizeSpinner.getValue()));
+                textArea.setFont(new Font(null, Font.PLAIN, (int) fontSizeSpinner.getValue()));
             }
             
         });
+
+        this.uploadMessage = new JButton("upload message");
+        this.uploadMessage.setSize(100, 100);
+        this.uploadMessage.addActionListener(this);
 
         this.fontColorButton = new JButton("Color");
         this.fontColorButton.addActionListener(this);
@@ -112,7 +121,7 @@ public class TextEditor extends JFrame implements ActionListener{
         String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         this.fontBox = new JComboBox<String>(fonts);
         this.fontBox.addActionListener(this);
-        this.fontBox.setSelectedItem(FONT);
+        this.fontBox.setSelectedItem(ConstantsGUI.FONT);
         
         // ------ menubar ------
 
@@ -122,20 +131,26 @@ public class TextEditor extends JFrame implements ActionListener{
         this.saveItem = new JMenuItem("Save");
         this.exitItem = new JMenuItem("Exit");
         this.logoutItem = new JMenuItem("Logout");
+        this.openClipBoardItem = new JMenuItem("Clipboard");
 
         this.openItem.addActionListener(this);
         this.saveItem.addActionListener(this);
         this.exitItem.addActionListener(this);
         this.logoutItem.addActionListener(this);
+        this.openClipBoardItem.addActionListener(this);
 
         this.fileMenu.add(openItem);
         this.fileMenu.add(saveItem);
         this.fileMenu.add(exitItem);
         this.fileMenu.add(logoutItem);
+        this.fileMenu.add(openClipBoardItem);
 
         this.menuBar.add(fileMenu);
 
         // ------ /menubar ------
+
+        
+        
 
         this.setJMenuBar(this.menuBar);
         this.add(this.fontLabel);
@@ -143,6 +158,7 @@ public class TextEditor extends JFrame implements ActionListener{
         this.add(this.fontBox);
         this.add(this.fontColorButton);
         this.add(profile);
+        this.add(this.uploadMessage);
         this.add(this.scrollPane);
         this.setVisible(true);
 
@@ -224,11 +240,53 @@ public class TextEditor extends JFrame implements ActionListener{
 
         if(e.getSource().equals(this.logoutItem)) {
             this.dispose();
-            new LoginPage();
+            try {
+                new LoginPage();
+            } catch (ClassNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+        if(e.getSource().equals(this.openClipBoardItem)) {
+            try {
+                new ClipBoard(this.username);
+            } catch (ClassNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
 
         if(e.getSource().equals(this.profile)) {
-            new ProfilePage(username);
+            try {
+                new ProfilePage(username);
+            } catch (ClassNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+        if(e.getSource().equals(this.uploadMessage)) {
+            try {
+                String message = this.textArea.getText();
+
+                boolean isMessageToLong = this.dataBaseController.saveMessage(this.username, message, ConstantsGUI.CLIPBOARD_MAX_MESSAGE_LENGTH);
+                if(isMessageToLong) {
+                    this.textArea.setText(ConstantsGUI.MESSAGE_TO_LONG_INFO);
+                }
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
     }
     

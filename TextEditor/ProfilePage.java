@@ -1,18 +1,24 @@
 package TextEditor;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+
 
 import LoginSystem.DataBaseController;
+
+import Constants.ConstantsDB;
+import Constants.ConstantsGUI;
 
 public class ProfilePage extends JFrame implements ActionListener{
     
@@ -24,9 +30,12 @@ public class ProfilePage extends JFrame implements ActionListener{
     JLabel newPasswordLabel;
     JLabel message;
     JButton reset;
+    DataBaseController dataBaseController;
 
-    public ProfilePage(String usernmae) {
-        this.setSize(TextEditor.WINDOW_WIDTH, TextEditor.WINDOW_HEIGHT);
+    public ProfilePage(String usernmae) throws ClassNotFoundException, SQLException {
+        dataBaseController = new DataBaseController();
+
+        this.setSize(ConstantsGUI.FRAME_WIDTH, ConstantsGUI.FRAME_HEIGHT);
         this.setLayout(null);
         this.setLocationRelativeTo(null);
 
@@ -91,27 +100,52 @@ public class ProfilePage extends JFrame implements ActionListener{
         }
 
         if(e.getSource().equals(this.reset)) {
-            System.out.println("am here");
             String username = this.username.getText();
-            String oldPassword = this.oldPassword.getText();
-            String newPassword = this.newPassword.getText();
+            char[] oldPassword = this.oldPassword.getPassword();
+            char[] newPassword = this.newPassword.getPassword();
+            String strOldPassword = new String(oldPassword);
+            String strNewPassword = new String(newPassword);
+            int passwordResetState = 0;
 
             try {
-                if(DataBaseController.resetPassword(username, oldPassword, newPassword)) {
-                    this.message.setText("Password Updated");
-                    this.message.setForeground(Color.GREEN);
-                    this.message.setVisible(true);
-                }
-                else {
-                    this.message.setText("Incorrect Password");
-                    this.message.setForeground(Color.RED);
-                    this.message.setVisible(true);
-                }
+                passwordResetState = this.dataBaseController.resetPassword(username, strOldPassword, strNewPassword);
             } catch (ClassNotFoundException e1) {
                 e1.printStackTrace();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+            } catch (UnsupportedEncodingException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (NoSuchAlgorithmException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (InvalidKeySpecException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
+
+            if(passwordResetState == ConstantsDB.CORRECT_PASSWORD_RETURN_VAL){
+                this.message.setText("Password Updated");
+                this.message.setForeground(Color.GREEN);
+                this.message.setVisible(true);
+            }
+            else if(passwordResetState == ConstantsDB.WEAK_PASSWORD_RETURN_VAL) {
+                this.message.setText("Weak Password");
+                this.message.setForeground(Color.RED);
+                this.message.setVisible(true);
+            }
+            else if(passwordResetState == ConstantsDB.INCORRECT_PASSWORD_RETURN_VAL){
+                this.message.setText("Incorrect Password");
+                this.message.setForeground(Color.RED);
+                this.message.setVisible(true);
+            }
+            else if(passwordResetState == ConstantsDB.MAX_PASSWORD_RESETS_REACHED_RETURN_VAL) {
+                this.message.setText("max amount of password resets has reached");
+                this.message.setForeground(Color.RED);
+                this.message.setVisible(true);
+            }
+
+
         }
 
     }
