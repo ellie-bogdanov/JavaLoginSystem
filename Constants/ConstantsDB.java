@@ -29,7 +29,7 @@ public class ConstantsDB {
     public static final String DRIVER_CONNECTION_NAME = "jdbc:mysql://localhost:3306/";
 
     public static final String ROOT_NAME = "root";       
-    public static final String DB_PASSWORD = "samgy2010";
+    public static final String DB_PASSWORD = "root";
     public static final String DB_NAME = "mydb";
 
     
