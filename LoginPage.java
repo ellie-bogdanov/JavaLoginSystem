@@ -25,36 +25,7 @@ import Constants.ConstantsGUI;
 
 public class LoginPage implements ActionListener{
 
-    /*static final int MAX_USERNAME_LENGTH = 20;
-    static final int MIN_USERNAME_LENGTH = 5;
 
-    static final int MAX_PASSWORD_LENGTH = 30;
-    static final int MIN_PASSWORD_LENGTH = 7;
-
-    static final int FRAME_WIDTH = 420;
-    static final int FRAME_HEIGHT = 420;
- 
-    static final int USER_LABEL_X = 50;
-    static final int USER_LABEL_Y = 100;
-    static final int USER_LABEL_WIDTH = 75;
-    static final int USER_LABEL_HEIGHT = 25;
- 
-    static final int USER_FIELD_X = 125;
-    static final int USER_FIELD_Y = 100;
-    static final int USER_FIELD_WIDTH = 200;
-    static final int USER_FIELD_HEIGHT = 25;
- 
-    static final int MESSAGE_LABEL_X = 125;
-    static final int MESSAGE_LABEL_Y = 250;
-    static final int MESSAGE_LABEL_WIDTH = 250;
-    static final int MESSAGE_LABEL_HEIGHT = 35;
- 
-    static final int BUTTON_X = 125;
-    static final int BUTTON_Y = 200;
-    static final int BUTTON_WIDTH = 100;
-    static final int BUTTON_HEIGHT = 25;
- 
-    static final int FONT_SIZE = 25;*/
 
 
     
