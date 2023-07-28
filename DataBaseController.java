@@ -24,46 +24,9 @@ import Constants.ConstantsDB;
 
 
 
-//data base consists of columns [ID, username, password, numOfPasswordChanges, passwordChangeTimer]
+//data base consists of columns [ID, username, password, numOfPasswordChanges, passwordChangeTimer, message]
 public class DataBaseController {
-    /*private static final int MAX_USERNAME_LENGTH = 20;
-    private static final int MIN_USERNAME_LENGTH = 5;
 
-    private static final int MAX_PASSWORD_LENGTH = 30;
-    private static final int MIN_PASSWORD_LENGTH = 7;
-
-    public static final int CORRECT_PASSWORD_RETURN_VAL  = 1;
-    public static final int INCORRECT_PASSWORD_RETURN_VAL = 2;
-    public static final int MAX_PASSWORD_RESETS_REACHED_RETURN_VAL = 3;
-
-    public static final int WEAK_PASSWORD_RETURN_VAL = 4;
-    public static final int WEAK_USERNAME_RETURN_VAL = 5;
-    public static final int USER_ALREADY_EXISTS_RETURN_VAL = 6;
-    public static final int USER_NOT_EXISTS_RETURN_VAL = 7;    
-    
-
-    private static final int USERNAME_INDEX = 2;
-    private static final int PASSWORD_INDEX = 3;
-    private static final int PASSWORD_RESET_INDEX = 4;
-    private static final int RESET_TIMER_INDEX = 5;
-    private static final int MESSAGE_INDEX = 6;
-
-    private static final int MAX_PASSWORD_RESETS = 3;
-
-    private static final long RESET_TIME_TO_ADD = 20000L;
-
-    private static final String USERNAME_NULL_MESSAGE = "username can not be null";
-    private static final String USERNAME_LENGTH_EXCEPTION = "username must be between " + MIN_USERNAME_LENGTH + " and " + MAX_USERNAME_LENGTH + " characters";
-    private static final String USERNAME_CONTAINS_SYMBOLS_EXCEPTION = "username must contain only letters and digits";
-
-    private static final String HASHING_ALG = "SHA-256";
-
-    private static final String DRIVER_NAME = "com.mysql.jdbc.Driver";
-    private static final String DRIVER_CONNECTION_NAME = "jdbc:mysql://localhost:3306/";
-    
-    private static final String ROOT_NAME = "root";       
-    private static final String DB_PASSWORD = "samgy2010";
-    private static final String DB_NAME = "mydb";*/
     Connection con;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()\u2013[{}]:;',?/*~$^+=<>]).{" + ConstantsDB.MIN_PASSWORD_LENGTH + "," + ConstantsDB.MAX_PASSWORD_LENGTH + "}$";
@@ -87,10 +50,7 @@ public class DataBaseController {
 
             String hashedPassword = new String(passwordHash(password), "UTF-8");
 
-            /*String query = "SELECT * FROM users WHERE username=?";
-            PreparedStatement stmt = this.con.prepareStatement(query);
 
-            stmt.setString(1, username);*/
             ResultSet rs = doesUserExists(username);
             
             boolean userExists = rs.next();
@@ -113,9 +73,7 @@ public class DataBaseController {
         }
 
         String hashedPassword = new String(passwordHash(password), "UTF-8");
-        /*String query = "SELECT * FROM users WHERE username = ?";
-        PreparedStatement stmt = this.con.prepareStatement(query);
-        stmt.setString(1, username);*/
+
         ResultSet rs = doesUserExists(username);
         boolean doesUserExists = rs.next();
         PreparedStatement stmt;
